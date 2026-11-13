@@ -96,8 +96,10 @@ export async function exportPosterPdf({
     context.fillStyle = settings.background;
     context.fillRect(0, 0, canvas.width, canvas.height);
 
-    const imageX = page.drawX + (plan.imageRect.x - page.window.x);
-    const imageY = page.drawY + (plan.imageRect.y - page.window.y);
+    // Posisi gambar relatif terhadap window tile (bukan terhadap halaman PDF).
+    // page.drawX/drawY hanya dipakai saat menempelkan canvas ke halaman.
+    const imageX = plan.imageRect.x - page.window.x;
+    const imageY = plan.imageRect.y - page.window.y;
     context.drawImage(
       image,
       imageX * scale,

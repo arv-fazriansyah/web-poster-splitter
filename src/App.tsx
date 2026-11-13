@@ -20,6 +20,8 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState<{ done: number; total: number } | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const dragDepth = useRef(0);
@@ -33,6 +35,7 @@ export default function App() {
 
   const handleFiles = useCallback(
     async (fileList: FileList | File[]) => {
+      if (exporting) return;
       const file = Array.from(fileList)[0];
       if (!file) return;
       setError(null);
@@ -72,12 +75,12 @@ export default function App() {
         setImageLoading(false);
       }
     },
-    [replaceImage],
+    [replaceImage, exporting],
   );
 
   const changePage = useCallback(
     async (target: number) => {
-      if (!pdf) return;
+      if (!pdf || exporting) return;
       const next = Math.min(Math.max(1, target), pdf.numPages);
       if (next === pageNo) return;
       setImageLoading(true);
@@ -92,7 +95,7 @@ export default function App() {
         setImageLoading(false);
       }
     },
-    [pdf, pageNo, replaceImage],
+    [pdf, pageNo, replaceImage, exporting],
   );
 
   const plan = useMemo(
@@ -105,8 +108,9 @@ export default function App() {
   const posterHeightCm = plan ? Math.round(plan.posterH / MM_TO_PT / 10) : 0;
 
   const onPatch = useCallback((patch: Partial<Settings>) => {
+    if (exporting) return;
     setSettings((c) => ({ ...c, ...patch }));
-  }, []);
+  }, [exporting]);
 
   const onBrowse = useCallback(() => { inputRef.current?.click(); }, []);
 
@@ -118,20 +122,31 @@ export default function App() {
   }, []);
 
   const onExport = useCallback(async () => {
-    if (!image || !plan) return;
+    if (!image || !plan || exporting) return;
     setError(null); setNotice(null);
+    setExporting(true);
+    setExportProgress({ done: 0, total: plan.pages.length });
     try {
-      const blob = await exportPosterPdf({ image: image.bitmap, plan, settings });
+      const blob = await exportPosterPdf({
+        image: image.bitmap,
+        plan,
+        settings,
+        onProgress: (done, total) => setExportProgress({ done, total }),
+      });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url; link.download = buildFileName(settings, plan);
+      link.style.display = 'none';
       document.body.appendChild(link); link.click(); link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 5000);
+      window.setTimeout(() => URL.revokeObjectURL(url), 60000);
       setNotice(`PDF siap — ${plan.pages.length} halaman, ${(blob.size / 1024 / 1024).toFixed(1)} MB`);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Ekspor PDF gagal.');
+    } finally {
+      setExporting(false);
+      setExportProgress(null);
     }
-  }, [image, plan, settings]);
+  }, [image, plan, settings, exporting]);
 
   useEffect(() => {
     if (!notice) return;
@@ -200,9 +215,12 @@ export default function App() {
             {image ? (
               <div className="preview-wrap">
                 <Preview image={image} plan={plan} background={settings.background} />
-                {imageLoading && (
+                {(imageLoading || exporting) && (
                   <div className="loading-overlay">
-                    <span className="spinner" aria-hidden="true" />Memuat…
+                    <span className="spinner" aria-hidden="true" />
+                    {exporting
+                      ? `Membuat PDF… ${exportProgress?.done ?? 0}/${exportProgress?.total ?? totalPages}`
+                      : 'Memuat…'}
                   </div>
                 )}
               </div>
@@ -230,6 +248,7 @@ export default function App() {
           settings={settings} onPatch={onPatch}
           image={image} pdf={pdf} pageNo={pageNo} onPageChange={changePage}
           plan={plan}
+          exporting={exporting} exportProgress={exportProgress}
           onExport={onExport} onBrowse={onBrowse} onClear={onClear}
         />
 

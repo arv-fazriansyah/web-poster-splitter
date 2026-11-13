@@ -11,6 +11,8 @@ interface Props {
   pageNo: number;
   onPageChange: (n: number) => void;
   plan: PosterPlan | null;
+  exporting: boolean;
+  exportProgress: { done: number; total: number } | null;
   onExport: () => void;
   onBrowse: () => void;
   onClear: () => void;
@@ -62,6 +64,7 @@ function Seg<T extends string | number>({ value, options, onChange, label }: {
 
 export function SettingsPanel({
   settings, onPatch, image, pdf, pageNo, onPageChange, plan,
+  exporting, exportProgress,
   onExport, onBrowse, onClear,
 }: Props) {
   const totalPages = plan?.pages.length ?? 0;
@@ -73,8 +76,8 @@ export function SettingsPanel({
           <div className="pdf-pager" style={{ border: 'none', paddingTop: 0 }}>
             <span style={{ fontSize: '11px' }}>Halaman {pageNo}/{pdf.numPages}</span>
             <div className="pdf-pager-controls">
-              <button className="icon-btn" onClick={() => onPageChange(pageNo - 1)} disabled={pageNo <= 1} aria-label="Sebelumnya">‹</button>
-              <button className="icon-btn" onClick={() => onPageChange(pageNo + 1)} disabled={pageNo >= pdf.numPages} aria-label="Selanjutnya">›</button>
+              <button className="icon-btn" onClick={() => onPageChange(pageNo - 1)} disabled={exporting || pageNo <= 1} aria-label="Sebelumnya">‹</button>
+              <button className="icon-btn" onClick={() => onPageChange(pageNo + 1)} disabled={exporting || pageNo >= pdf.numPages} aria-label="Selanjutnya">›</button>
             </div>
           </div>
         </Sec>
@@ -115,13 +118,16 @@ export function SettingsPanel({
       {/* ── AKSI ── */}
       <Sec title="Aksi">
         <div className="btn-row">
-          <button type="button" className="btn btn-primary" onClick={onExport} disabled={!image}>
-            Unduh PDF ({totalPages})
+          <button type="button" className="btn btn-primary" onClick={onExport}
+            disabled={!image || exporting} aria-busy={exporting}>
+            {exporting
+              ? `Membuat PDF… ${exportProgress?.done ?? 0}/${exportProgress?.total ?? totalPages}`
+              : `Unduh PDF (${totalPages})`}
           </button>
-          <button type="button" className="btn btn-ghost" onClick={onBrowse} disabled={!image}>
+          <button type="button" className="btn btn-ghost" onClick={onBrowse} disabled={!image || exporting}>
             Ganti
           </button>
-          <button type="button" className="btn btn-ghost btn-danger" onClick={onClear} disabled={!image}>
+          <button type="button" className="btn btn-ghost btn-danger" onClick={onClear} disabled={!image || exporting}>
             Hapus
           </button>
         </div>
