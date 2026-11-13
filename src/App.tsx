@@ -185,18 +185,6 @@ export default function App() {
       {/* ── MAIN: settings left | preview right ── */}
       <main className="main" onDragEnter={onDragEnter} onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}>
 
-        {/* SETTINGS SIDEBAR (left) */}
-        <aside className="settings-sidebar">
-          <div className="scroll-settings">
-            <SettingsPanel
-              settings={settings} onPatch={onPatch}
-              image={image} pdf={pdf} pageNo={pageNo} onPageChange={changePage}
-              plan={plan}
-              onExport={onExport} onBrowse={onBrowse} onClear={onClear}
-            />
-          </div>
-        </aside>
-
         {/* PREVIEW AREA (right) */}
         <section className="preview-area">
           <div className="toolbar">
@@ -236,6 +224,14 @@ export default function App() {
 
           {/* progress bar at bottom of preview area — removed; now in settings panel */}
         </section>
+
+        {/* SETTINGS SECTIONS (left) — tanpa pembungkus */}
+        <SettingsPanel
+          settings={settings} onPatch={onPatch}
+          image={image} pdf={pdf} pageNo={pageNo} onPageChange={changePage}
+          plan={plan}
+          onExport={onExport} onBrowse={onBrowse} onClear={onClear}
+        />
 
       </main>
 

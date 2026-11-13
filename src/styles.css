@@ -86,41 +86,44 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* Mobile: preview dulu, pengaturan di bawahnya (bisa di-scroll halaman) */
 .preview-area { order: -1; }
-.settings-sidebar { order: 0; width: 100%; }
 
-/* Desktop: sidebar kiri dengan scroll sendiri, preview mengisi tinggi layar */
+/* Desktop: kolom kiri berisi section langsung, preview di kolom kanan.
+   Preview di-absolute agar tingginya persis mengikuti total tinggi panel kiri. */
 @media (min-width: 860px) {
-  .app {
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
-  }
   .main {
-    grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+    display: block;
+    position: relative;
+    flex: 0 0 auto;
   }
-  .preview-area { order: 0; min-height: 0; }
-  .settings-sidebar {
+  .preview-area {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: calc(100% - 328px);
+    order: 0;
     min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
   }
+  .main > .section { width: 320px; margin-bottom: 8px; }
+  .main > .section:last-child { margin-bottom: 0; }
 }
 
-/* ── SETTINGS SIDEBAR ─────────────────────────────────── */
-.settings-sidebar {
-  background: var(--sidebar);
+/* ── PANEL FRAME (preview) ────────────────────────────── */
+.preview-area {
+  background: var(--panel);
   border: 2px solid var(--line);
-  padding: 8px;
+  padding: 10px;
   box-shadow: 4px 4px 0 var(--line);
 }
 
-.scroll-settings { display: block; min-height: 0; }
+
 
 .section {
   background: var(--panel);
   border: 2px solid var(--line);
   padding: 8px;
   margin-bottom: 6px;
+  box-shadow: 4px 4px 0 var(--line);
 }
 .section:last-child { margin-bottom: 0; }
 
@@ -230,13 +233,9 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ── PREVIEW AREA ─────────────────────────────────────── */
 .preview-area {
-  background: var(--panel);
-  border: 2px solid var(--line);
-  padding: 10px;
   display: flex;
   flex-direction: column;
   min-height: min(72dvh, 620px);
-  box-shadow: 4px 4px 0 var(--line);
 }
 
 .toolbar {
@@ -322,6 +321,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .dropzone { max-width: 100%; }
 
 @media (max-width: 859px) {
+  .main > .section { margin-bottom: 0; }
   .app { padding: 6px; gap: 6px; padding-bottom: max(6px, env(safe-area-inset-bottom)); }
   .topbar { padding: 8px 10px; }
   body { font-size: 13px; }
