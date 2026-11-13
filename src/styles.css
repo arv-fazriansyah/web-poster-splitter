@@ -174,20 +174,21 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   border: 2px solid var(--line); 
   background: var(--panel);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 3px; transition: border-color 0.05s, background 0.05s;
+  gap: 4px; padding: 4px;
+  transition: border-color 0.05s, background 0.05s;
   box-shadow: 2px 2px 0 var(--line);
 }
 .preset:hover { border-color: var(--accent); transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--accent); }
 .preset:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--line); }
 .preset.is-active { border-color: var(--accent); background: var(--accent-soft); box-shadow: 2px 2px 0 var(--accent); }
-.preset-grid { display: grid; gap: 1px; width: 18px; }
-.preset-2x2 .preset-grid { grid-template-columns: repeat(2, 1fr); }
-.preset-3x3 .preset-grid { grid-template-columns: repeat(3, 1fr); }
-.preset-4x4 .preset-grid { grid-template-columns: repeat(4, 1fr); }
-.preset-5x5 .preset-grid { grid-template-columns: repeat(5, 1fr); }
-.preset-grid span { background: var(--line); }
+.preset-grid { display: grid; gap: 1px; width: 22px; }
+.preset-grid.preset-2x2 { grid-template-columns: repeat(2, 1fr); }
+.preset-grid.preset-3x3 { grid-template-columns: repeat(3, 1fr); }
+.preset-grid.preset-4x4 { grid-template-columns: repeat(4, 1fr); }
+.preset-grid.preset-5x5 { grid-template-columns: repeat(5, 1fr); }
+.preset-grid span { display: block; width: 100%; aspect-ratio: 1; background: var(--line); }
 .preset.is-active .preset-grid span { background: var(--accent); }
-.preset-label { font-size: 9px; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.preset-label { width: 100%; text-align: center; font-size: 9px; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
 .preset.is-active .preset-label { color: var(--accent); }
 
 /* ── PDF PAGER ────────────────────────────────────────── */
