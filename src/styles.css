@@ -235,7 +235,6 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .preview-area {
   display: flex;
   flex-direction: column;
-  min-height: min(72dvh, 620px);
 }
 
 .toolbar {
@@ -322,6 +321,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 @media (max-width: 859px) {
   .main > .section { margin-bottom: 0; }
+  .preview-area { min-height: min(72dvh, 620px); }
   .app { padding: 6px; gap: 6px; padding-bottom: max(6px, env(safe-area-inset-bottom)); }
   .topbar { padding: 8px 10px; }
   body { font-size: 13px; }
